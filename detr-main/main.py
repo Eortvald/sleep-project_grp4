@@ -158,8 +158,8 @@ def main(args):
     # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
     # data_dir="/scratch/s194277/mros/h5"
     # data_dir="/scratch/aneol/detr-mros/"
-    #data_dir = "/scratch/s194277/mros/h5"
-    data_dir = "/scratch/aneol/detr-mros/"
+    data_dir = "/scratch/s194277/mros/h5"
+    #data_dir = "/scratch/aneol/detr-mros/"
 
     params = dict(
         data_dir=data_dir,
