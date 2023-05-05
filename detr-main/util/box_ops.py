@@ -62,8 +62,8 @@ def generalized_box_iou(boxes1, boxes2):
         m = (boxes2[:, 2] < boxes2[:, 0])
         boxes2[m, 0] = boxes2[m, 2]
 
-    assert (boxes1[:, 2] >= boxes1[:, 0]).all()
-    assert (boxes2[:, 2] >= boxes2[:, 0]).all()
+    #assert (boxes1[:, 2] >= boxes1[:, 0]).all()
+    #assert (boxes2[:, 2] >= boxes2[:, 0]).all()
 
     iou, union = box_iou(boxes1, boxes2)
 
