@@ -4,14 +4,14 @@ import tempfile
 # fmt: off
 JOBS = [
     {
-        "jobname": "4_dep",
+        "jobname": "4_detr",
         "partition": "titans",
         "reservation": "comp-gpu04",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
         "ncpus": 4,  # Number of CPU cores
         "gpus": 4,  # Number of GPUs
         "memory": "64G",  # This is total RAM, change this accordingly to use
-        "command": "python -m torch.distributed.launch detr-main/main.py",
+        "command": "python -m torch.distributed.launch --nproc_per_node=4 --use_env main.py detr-main/main.py",
         "log_path": "/scratch/s194277/new_hyper"  # Usually this is your scratch space
 
     },
