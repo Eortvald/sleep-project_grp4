@@ -10,7 +10,7 @@ JOBS = [
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
         "ncpus": 8,  # Number of CPU cores
         "gpus": 1,  # Number of GPUs
-        "memory": "128G",  # This is total RAM, change this accordingly to use
+        "memory": "64G",  # This is total RAM, change this accordingly to use
         "command": "python -m torch.distributed.launch --nproc_per_node=1 --use_env detr-main/main.py",
         "log_path": "/scratch/s194277/new_hyper"  # Usually this is your scratch space
 

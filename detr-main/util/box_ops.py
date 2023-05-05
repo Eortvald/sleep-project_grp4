@@ -55,11 +55,11 @@ def generalized_box_iou(boxes1, boxes2):
     # boxes1 = prediction_boxes -- boxes2 = target_boxes #
     # degenerate boxes gives inf / nan results, so do an early check
     if not (boxes1[:, 2] >= boxes1[:, 0]).all():
-        m = boxes1[:, 2] <= boxes1[:, 0]
+        m = (boxes1[:, 2] < boxes1[:, 0])
         boxes1[m, 0] = boxes1[m, 2]
 
     if not (boxes2[:, 2] >= boxes2[:, 0]).all():
-        m = boxes2[:, 2] <= boxes2[:, 0]
+        m = (boxes2[:, 2] < boxes2[:, 0])
         boxes2[m, 0] = boxes2[m, 2]
 
     assert (boxes1[:, 2] >= boxes1[:, 0]).all()
