@@ -61,17 +61,16 @@ class Trainer(object):
         empty_trainer = type(self)(self.args)
         return submitit.helpers.DelayedSubmission(empty_trainer)'''
 
-    def _setup_gpu_args(self):
-        import submitit
-        from pathlib import Path
+def _setup_gpu_args(self):
+    import submitit
+    from pathlib import Path
 
-        job_env = submitit.JobEnvironment()
-        self.args.output_dir = Path(str(self.args.output_dir).replace("%j", str(job_env.job_id)))
-        self.args.gpu = job_env.local_rank
-        self.args.rank = job_env.global_rank
-        self.args.world_size = job_env.num_tasks
-        print(f"Process group: {job_env.num_tasks} tasks, rank: {job_env.global_rank}")
-
+    job_env = submitit.JobEnvironment()
+    self.args.output_dir = Path(str(self.args.output_dir).replace("%j", str(job_env.job_id)))
+    self.args.gpu = job_env.local_rank
+    self.args.rank = job_env.global_rank
+    self.args.world_size = job_env.num_tasks
+    print(f"Process group: {job_env.num_tasks} tasks, rank: {job_env.global_rank}")
 
 def main():
     args = parse_args()
