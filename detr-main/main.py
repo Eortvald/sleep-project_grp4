@@ -27,8 +27,8 @@ from mros_data.utils import collate
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
-    parser.add_argument('--lr', default=1e-3, type=float)
-    parser.add_argument('--lr_backbone', default=1e-3, type=float)
+    parser.add_argument('--lr', default=1e-4, type=float)
+    parser.add_argument('--lr_backbone', default=1e-4, type=float)
     parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
     parser.add_argument('--epochs', default=150, type=int)
@@ -158,15 +158,15 @@ def main(args):
     # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
     # data_dir="/scratch/s194277/mros/h5"
     # data_dir="/scratch/aneol/detr-mros/"
-    data_dir = "/scratch/s194277/mros/h5"
-    #data_dir = "/scratch/aneol/detr-mros/"
+    #data_dir = "/scratch/s194277/mros/h5"
+    data_dir = "/scratch/aneol/detr-mros/"
 
     params = dict(
         data_dir=data_dir,
         batch_size=args.batch_size,
         #n_eval=500 if data_dir == "/scratch/aneol/detr-mros/" else 70,
         #n_test=500 if data_dir == "/scratch/aneol/detr-mros/" else 70,
-        n_test=50,
+        n_test=0,
         n_eval=50,
         num_workers=0,
         seed=1338,
