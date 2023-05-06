@@ -119,9 +119,8 @@ def main(args):
         assert args.masks, "Frozen training is meant for segmentation only"
     print(args)
 
-    device = torch.device('cuda')
-    device='0,1,2,3,4,5'
-    torch.cuda.set_device(args.local_rank)
+    device = torch.device(args.device)
+
     # fix the seed for reproducibility
     seed = args.seed + utils.get_rank()
     torch.manual_seed(seed)
