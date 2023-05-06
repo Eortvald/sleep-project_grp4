@@ -21,22 +21,21 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_shared_folder() -> Path:
+'''def get_shared_folder() -> Path:
     user = os.getenv("USER")
     if Path("/checkpoint/").is_dir():
         p = Path(f"/checkpoint/{user}/experiments")
         p.mkdir(exist_ok=True)
         return p
     raise RuntimeError("No shared folder available")
-
-
-def get_init_file():
+'''
+'''def get_init_file():
     # Init file must not exist, but it's parent dir must exist.
     os.makedirs(str(get_shared_folder()), exist_ok=True)
     init_file = get_shared_folder() / f"{uuid.uuid4().hex}_init"
     if init_file.exists():
         os.remove(str(init_file))
-    return init_file
+    return init_file'''
 
 
 class Trainer(object):
@@ -49,7 +48,7 @@ class Trainer(object):
         self._setup_gpu_args()
         detection.main(self.args)
 
-    def checkpoint(self):
+'''    def checkpoint(self):
         import os
         import submitit
         from pathlib import Path
@@ -60,7 +59,7 @@ class Trainer(object):
             self.args.resume = checkpoint_file
         print("Requeuing ", self.args)
         empty_trainer = type(self)(self.args)
-        return submitit.helpers.DelayedSubmission(empty_trainer)
+        return submitit.helpers.DelayedSubmission(empty_trainer)'''
 
     def _setup_gpu_args(self):
         import submitit
@@ -98,7 +97,7 @@ def main():
 
     executor.update_parameters(name="detr")
 
-    args.dist_url = get_init_file().as_uri()
+    #args.dist_url = get_init_file().as_uri()
     args.output_dir = args.job_dir
 
     trainer = Trainer(args)
