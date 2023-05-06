@@ -2,9 +2,9 @@ from typing import List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
-from librosa import power_to_db, stft
-from librosa.feature import melspectrogram
-from librosa.display import specshow
+from librosa import stft  # , power_to_db
+#from librosa.feature import melspectrogram
+#from librosa.display import specshow
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
