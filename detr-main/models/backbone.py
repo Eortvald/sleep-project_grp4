@@ -126,12 +126,12 @@ class Custom_Backbone(nn.Module):
         self.max_pool2   = nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
 
 
-        self.conv_layer3 = nn.Conv2d(4*8*C, 2*4*8*C,kernel_size=(1,3), stride=(1,2))
+        self.conv_layer3 = nn.Conv2d(4*8*C, 2*4*8*C,kernel_size=(1,3), stride=(1,1))
         self.batch_norm3 = nn.BatchNorm2d(2*4*8*C)
         self.max_pool3   = nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
 
 
-        self.conv_layer4 = nn.Conv2d(2*4*8*C, 2*2*4*8*C,kernel_size=(1,3), stride=(1,2))
+        self.conv_layer4 = nn.Conv2d(2*4*8*C, 2*2*4*8*C,kernel_size=(1,3), stride=(1,1))
         self.batch_norm4 = nn.BatchNorm2d(2*2*4*8*C)
         self.max_pool4   = nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
 
