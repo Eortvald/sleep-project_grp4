@@ -9,7 +9,7 @@ import sys
 
 from pathlib import Path
 
-sys.path.append('/home/s203877/sleep-project_grp4/detr-main')
+sys.path.append('/home/s194277/sleep/sleep-project_grp4/detr-main')
 import main as detection
 import submitit
 
@@ -33,7 +33,7 @@ def get_shared_folder() -> Path:
     #     p.mkdir(exist_ok=True)
     #     return p
     # p = Path(f"/home/s203877/bachelor/checkpoint")
-    p = Path(f"/scratch/s203877/checkpoint")
+    p = Path(f"/scratch/s194277/checkpoint")
     p.mkdir(exist_ok=True)
     return p
     raise RuntimeError("No shared folder available")
@@ -53,7 +53,7 @@ class Trainer(object):
         self.args = args
 
     def __call__(self):
-        sys.path.append('/home/s203877/bachelor/sleep-project_grp4/detr-main')
+        sys.path.append('/home/s194277/sleep/sleep-project_grp4/detr-main')
         import main as detection
 
         self._setup_gpu_args()
@@ -65,10 +65,10 @@ class Trainer(object):
         from pathlib import Path
 
         self.args.dist_url = get_init_file().as_uri()
-        checkpoint_file = os.path.join("/scratch/s203877/checkpoint/3546/checkpoint0049.pth")
+        checkpoint_file = os.path.join("/scratch/s194277/checkpoint/checkpoint_049.pth")
         if True:
-            # if os.path.exists(checkpoint_file):
-            self.args.resume = checkpoint_file
+            if os.path.exists(checkpoint_file):
+                self.args.resume = checkpoint_file
         print("Requeuing ", self.args)
         empty_trainer = type(self)(self.args)
         return submitit.helpers.DelayedSubmission(empty_trainer)
@@ -105,10 +105,10 @@ def main():
         cpus_per_task=2,
         nodes=nodes,
         timeout_min=timeout_min,  # max is 60 * 72
-        slurm_additional_parameters={"nodelist": "comp-gpu07"}
+        slurm_additional_parameters={"nodelist": "comp-gpu06"}
     )
 
-    executor.update_parameters(name="detr")
+    executor.update_parameters(name="low-bb")
 
     args.dist_url = get_init_file().as_uri()
     args.output_dir = args.job_dir
