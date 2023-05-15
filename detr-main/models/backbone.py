@@ -164,8 +164,6 @@ class Custom_Backbone(nn.Module):
         out = self.conv_layer5(out)
         out = self.batch_norm5(out)
         out = self.max_pool4(out)
-        print(out.shape)
-        raise
         xs = {'0': out}
 
         out: Dict[str, NestedTensor] = {}
