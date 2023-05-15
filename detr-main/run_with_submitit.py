@@ -5,8 +5,11 @@ A script to run multinode training with submitit.
 import argparse
 import os
 import uuid
+import sys
+
 from pathlib import Path
 
+sys.path.append('/home/s203877/sleep-project_grp4/detr-main')
 import main as detection
 import submitit
 
@@ -16,18 +19,25 @@ def parse_args():
     parser = argparse.ArgumentParser("Submitit for detection", parents=[detection_parser])
     parser.add_argument("--ngpus", default=6, type=int, help="Number of gpus to request on each node")
     parser.add_argument("--nodes", default=1, type=int, help="Number of nodes to request")
-    parser.add_argument("--timeout", default=60 * 72, type=int, help="Duration of the job")
-    parser.add_argument("--job_dir", default="/scratch/s194277/new_hyper", type=str, help="Job dir. Leave empty for automatic.")
+    parser.add_argument("--timeout", default=60 * 24 * 4, type=int, help="Duration of the job")
+    parser.add_argument("--job_dir", default="", type=str, help="Job dir. Leave empty for automatic.")
+
+    # parser.add_argument("--resume", default="/scratch/s203877/checkpoints/3365/checkpoint0019.pth", type=str, help="resume path.")
     return parser.parse_args()
 
 
 def get_shared_folder() -> Path:
     user = os.getenv("USER")
-    if Path("/checkpoint/").is_dir():
-        p = Path(f"/checkpoint/{user}/experiments")
-        p.mkdir(exist_ok=True)
-        return p
+    # if Path("/checkpoint/").is_dir():
+    #     p = Path(f"/checkpoint/{user}/experiments")
+    #     p.mkdir(exist_ok=True)
+    #     return p
+    # p = Path(f"/home/s203877/bachelor/checkpoint")
+    p = Path(f"/scratch/s203877/checkpoint")
+    p.mkdir(exist_ok=True)
+    return p
     raise RuntimeError("No shared folder available")
+
 
 def get_init_file():
     # Init file must not exist, but it's parent dir must exist.
@@ -43,6 +53,7 @@ class Trainer(object):
         self.args = args
 
     def __call__(self):
+        sys.path.append('/home/s203877/bachelor/sleep-project_grp4/detr-main')
         import main as detection
 
         self._setup_gpu_args()
@@ -54,8 +65,9 @@ class Trainer(object):
         from pathlib import Path
 
         self.args.dist_url = get_init_file().as_uri()
-        checkpoint_file = os.path.join(self.args.output_dir, "checkpoint.pth")
-        if os.path.exists(checkpoint_file):
+        checkpoint_file = os.path.join("/scratch/s203877/checkpoint/3546/checkpoint0049.pth")
+        if True:
+            # if os.path.exists(checkpoint_file):
             self.args.resume = checkpoint_file
         print("Requeuing ", self.args)
         empty_trainer = type(self)(self.args)
@@ -87,12 +99,13 @@ def main():
     timeout_min = args.timeout
 
     executor.update_parameters(
-        mem_gb=40 * num_gpus_per_node,
+        mem_gb=128,
         gpus_per_node=num_gpus_per_node,
         tasks_per_node=num_gpus_per_node,  # one task per GPU
-        cpus_per_task=10,
+        cpus_per_task=2,
         nodes=nodes,
         timeout_min=timeout_min,  # max is 60 * 72
+        slurm_additional_parameters={"nodelist": "comp-gpu07"}
     )
 
     executor.update_parameters(name="detr")

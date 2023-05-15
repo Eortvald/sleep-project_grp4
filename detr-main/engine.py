@@ -41,7 +41,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             labels = target[:, 2].long()
             dict_t = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict_t)
-
+        samples = samples[:, None, :, :]
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
         outputs = model(samples)
@@ -125,6 +125,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
             labels = target[:, 2].long()
             dict_t = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict_t)
+        samples = samples[:, None, :, :]
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
         outputs = model(samples)
