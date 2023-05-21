@@ -6,6 +6,10 @@ from librosa.display import specshow
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
+def legend_without_duplicate_labels(ax):
+    handles, labels = ax.get_legend_handles_labels()
+    unique = [(h, l) for i, (h, l) in enumerate(zip(handles, labels)) if l not in labels[:i]]
+    ax.legend(*zip(*unique), loc='upper right')
 
 def plot_data(
     data: np.ndarray,
@@ -39,6 +43,7 @@ def plot_data(
 
     # Plot events
     for event_label in np.unique(events[:, -1]):
+        event_label_dict = {0.0: 'Arousal', 1.0: 'Leg Movement', 2.0: 'Sleep-disordered Breathing'}
         if event_label == 0.0:
             color = "r"
         elif event_label == 1.0:
@@ -47,7 +52,9 @@ def plot_data(
             color = "cornflowerblue"
         class_events = events[events[:, -1] == event_label, :-1] * T / fs
         for evt_start, evt_stop in class_events:
-            ax.axvspan(evt_start, evt_stop, facecolor=color, alpha=0.6, edgecolor=None)
+            label = np.unique(event_label_dict[event_label])
+            ax.axvspan(evt_start, evt_stop, facecolor=color, alpha=0.6 if not color=='yellow' else 0.8, edgecolor=None, label = label)
+            legend_without_duplicate_labels(ax)
 
     # Calculate the offset between signals
     data = (
@@ -69,6 +76,12 @@ def plot_data(
     ax.set_yticks(ticks=offset[:, 0], labels=channel_names)
     ax.set_title(title)
 
+    font = {'family': 'normal',
+            'weight': 'bold',
+            'size': 20}
+
+    plt.rc('font', **font)
+    fig.savefig('10channel.jpg')
     return fig, ax
 
 
