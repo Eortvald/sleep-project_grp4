@@ -11,10 +11,10 @@ import ast
 
 def event_dist():
     params = dict(
-        data_dir="D:/10channel",
+        data_dir="/scratch/aneol/detr-mros/",
         batch_size=1,
-        n_eval=1,
-        n_test=1,
+        n_eval=0,
+        n_test=0,
         num_workers=0,
         seed=1337,
         events={"ar": "arousals", "sdb": "Sleep-disordered breathing", "lm": "Leg Movement"},
@@ -26,7 +26,7 @@ def event_dist():
         fs=128,
         matching_overlap=0.5,
         n_jobs=-1,
-        n_records=3,
+        n_records=2831,
         # picks=["c3", "c4"],
         picks=["c3", "c4", "eogl", 'eogr', 'chin', 'legl', 'legr', 'nasal', 'abdo', 'thor'],
         # transform=MultitaperTransform(128, 0.5, 35.0, tw=8.0, normalize=True),
