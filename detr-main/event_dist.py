@@ -48,6 +48,6 @@ def event_dist():
     plt.hist(no_events, density=True, bins=50)
     plt.ylabel('Prob')
     plt.xlabel('Number of events in a 600s window')
-    plt.savefig('event_dist.jpg')
+    plt.savefig('/scratch/s194277/event_dist.jpg')
 
 event_dist()
