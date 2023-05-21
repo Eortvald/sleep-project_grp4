@@ -45,9 +45,12 @@ def event_dist():
     # The dataloaders are generators, ie. we can iterate over them using a for-loop.
     for i, (data, events, records, *_) in enumerate(train_dl):
         no_events.append(len(events[0]))
+
+    print('creating histogram')
     plt.hist(no_events, density=True, bins=50)
     plt.ylabel('Prob')
     plt.xlabel('Number of events in a 600s window')
+    print('saving figure')
     plt.savefig('/scratch/s194277/event_dist.jpg')
 
 event_dist()
