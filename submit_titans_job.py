@@ -4,14 +4,14 @@ import tempfile
 # fmt: off
 JOBS = [
     {
-        "jobname": "DOSED",
+        "jobname": "event_dist",
         "partition": "titans",
         "reservation": "comp-gpu04",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
         "ncpus": 16,  # Number of CPU cores
         "gpus": 1,  # Number of GPUs
         "memory": "128G",  # This is total RAM, change this accordingly to use
-        "command": "python main.py",
+        "command": "python detr-main/event_dist.py",
         "log_path": "/scratch/s194277/"  # Usually this is your scratch space
 
     },
@@ -40,7 +40,7 @@ cd $HOME/sleep/sleep-project_grp4
 source $GROUP_HOME/opt/miniconda3/bin/activate
 
 # Activate correct conda environment
-conda activate bscslp
+conda activate bscslp2
 
 # Run command
 {command}
