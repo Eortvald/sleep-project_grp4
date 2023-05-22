@@ -69,19 +69,18 @@ def plot_data(
         offset[idx + 1] = -2 * (idx + 1)
 
     # Plot signals
-    ax.plot(time_vector, data.T + offset.T, color="gray", linewidth=1)
+    ax.plot(time_vector, data.T + offset.T, color="gray", linewidth=0.1)
 
     # Adjust plot visuals
     ax.set_xlim(time_vector[0], time_vector[-1])
     ax.set_yticks(ticks=offset[:, 0], labels=channel_names)
     ax.set_title(title)
 
-    font = {'family': 'normal',
+    font = {'family': 'Times new roman',
             'weight': 'bold',
             'size': 20}
 
     plt.rc('font', **font)
-    fig.savefig('10channel.jpg')
     return fig, ax
 
 

@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import torch
 import numpy as np
 import ast
+import json
 
 def event_dist():
     params = dict(
@@ -41,16 +42,21 @@ def event_dist():
     # The datamodule will split the dataset into train/eval partitions by calling the setup() method.
     dm.setup('fit')
     train_dl, eval_dl = dm.train_dataloader(), dm.val_dataloader()
-    no_events = []
-    # The dataloaders are generators, ie. we can iterate over them using a for-loop.
-    for i, (data, events, records, *_) in enumerate(train_dl):
-        no_events.append(len(events[0]))
+    train_ds = dm.train
+    no_ar = 0
+    no_leg = 0
+    no_sdb = 0
+    # print(train_ds[0]['signal'].shape)
+    for idx, batch in enumerate(train_ds):
+        events = batch['events']
+        no_ar += list(events[:, -1]).count(0)
+        no_leg += list(events[:, -1]).count(1)
+        no_sdb += list(events[:, -1]).count(2)
+    no_events = {'Ar': no_ar, 'Lm': no_leg, 'Sdb': no_sdb}
+    print(no_events)
 
-    print('creating histogram')
-    plt.hist(no_events, density=True, bins=50)
-    plt.ylabel('Prob')
-    plt.xlabel('Number of events in a 600s window')
-    print('saving figure')
-    plt.savefig('/scratch/s194277/event_dist.jpg')
+    with open("/scratch/s194277/event_count.json", "w+") as f:
+        print('saving')
+        json.dump(no_events, f)
 
 event_dist()
