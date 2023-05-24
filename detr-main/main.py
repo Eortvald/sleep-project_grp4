@@ -29,9 +29,9 @@ def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
     parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--lr_backbone', default=1e-4, type=float)
-    parser.add_argument('--batch_size', default=1, type=int)
+    parser.add_argument('--batch_size', default=6, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
-    parser.add_argument('--epochs', default=150, type=int)
+    parser.add_argument('--epochs', default=300, type=int)
     parser.add_argument('--lr_drop', default=100, type=int)
     parser.add_argument('--clip_max_norm', default=0.1, type=float,
                         help='gradient clipping max norm')
@@ -101,7 +101,7 @@ def get_args_parser():
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
     parser.add_argument('--eval', action='store_true')
-    parser.add_argument('--num_workers', default=2, type=int)
+    parser.add_argument('--num_workers', default=0, type=int)
 
     # distributed training parameters
     parser.add_argument('--world_size', default=6, type=int,
@@ -154,18 +154,18 @@ def main(args):
     #dataset_train = build_dataset(image_set='train', args=args)
     #dataset_val = build_dataset(image_set='val', args=args)
 
-    data_dir = "D:/10channel"
+    #data_dir = "D:/10channel"
     # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
     # data_dir="/scratch/s194277/mros/h5"
-    #data_dir="/scratch/aneol/detr-mros/"
+    data_dir="/scratch/aneol/detr-mros/"
     #data_dir = "/scratch/s194277/mros/h5"
     #data_dir = "/scratch/aneol/detr-mros/"
 
     params = dict(
         data_dir=data_dir,
         batch_size=args.batch_size,
-        n_eval=400 if data_dir == "/scratch/aneol/detr-mros/" else 1,
-        n_test=300 if data_dir == "/scratch/aneol/detr-mros/" else 1,
+        n_eval=200 if data_dir == "/scratch/aneol/detr-mros/" else 1,
+        n_test=0 if data_dir == "/scratch/aneol/detr-mros/" else 1,
         num_workers=0,
         seed=1338,
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
@@ -183,10 +183,10 @@ def main(args):
         transform=None,
         scaling="robust",
     )
-    '''wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
+    wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
     wandb.init(
         # set the wandb project where this run will be logged
-        project='detr-low-complex',
+        project='Low-complex',
 
         # track hyperparameters and run metadata
         config={
@@ -197,7 +197,7 @@ def main(args):
             "epochs": args.epochs,
             "batch_size": args.batch_size
         }
-    )'''
+    )
 
     dm = SleepEventDataModule(**params)
     dm.setup('fit')
@@ -286,7 +286,7 @@ def main(args):
         test_stats, coco_evaluator = evaluate(
             model, criterion, postprocessors, data_loader_val, base_ds, device, args.output_dir
         )
-        '''wandb.log({
+        wandb.log({
             "train_loss": train_stats['loss'],
             "train_class_error": train_stats['class_error'],
             "train_loss_bbox": train_stats['loss_bbox'],
@@ -297,7 +297,7 @@ def main(args):
             "test_class_error": test_stats['class_error'],
             "test_loss_bbox": test_stats['loss_bbox'],
             "test_loss_giou": test_stats['loss_giou']
-        })'''
+        })
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                      **{f'test_{k}': v for k, v in test_stats.items()},
