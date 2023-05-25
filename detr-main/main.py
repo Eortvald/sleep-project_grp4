@@ -290,9 +290,7 @@ def main(args):
             "train_loss": train_stats['loss'],
             "train_class_error": train_stats['class_error'],
             "train_loss_bbox": train_stats['loss_bbox'],
-            "train_loss_giou": train_stats['loss_giou']
-        })
-        wandb.log({
+            "train_loss_giou": train_stats['loss_giou'],
             "test_loss": test_stats['loss'],
             "test_class_error": test_stats['class_error'],
             "test_loss_bbox": test_stats['loss_bbox'],
