@@ -9,7 +9,7 @@ import sys
 
 from pathlib import Path
 
-sys.path.append('/home/s203877/sleep-project_grp4/detr-main')
+sys.path.append('/home/s203877/bachelor/low-complex/sleep-project_grp4/detr-main')
 #sys.path.append('/home/s194277/sleep/sleep-project_grp4/detr-main')
 import main as detection
 import submitit
@@ -54,8 +54,7 @@ class Trainer(object):
         self.args = args
 
     def __call__(self):
-        sys.path.append('/home/s203877/sleep-project_grp4/detr-main')
-
+        sys.path.append('/home/s203877/bachelor/low-complex/sleep-project_grp4/detr-main')
         #sys.path.append('/home/s194277/sleep/sleep-project_grp4/detr-main')
         import main as detection
 
@@ -108,7 +107,7 @@ def main():
         cpus_per_task=4,
         nodes=nodes,
         timeout_min=timeout_min,  # max is 60 * 72
-        slurm_additional_parameters={"nodelist": "comp-gpu06"}
+        slurm_additional_parameters={"nodelist": "comp-gpu01"}
     )
 
     executor.update_parameters(name="low-bb")
