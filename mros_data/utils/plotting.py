@@ -5,6 +5,7 @@ import numpy as np
 from librosa.display import specshow
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+import matplotlib.patches as patches
 
 def legend_without_duplicate_labels(ax):
     handles, labels = ax.get_legend_handles_labels()
@@ -98,21 +99,41 @@ def plot_spectrogram(
 
     # Get current axes or create new
     if ax is None:
-        fig, ax = plt.subplots(figsize=(25, 4))
+        fig, ax = plt.subplots(3, 3, figsize=(24,9))
     else:
         fig = ax.get_figure()
+    itn = {1: 'c4', 2: 'eog l', 3: 'eog r', 4: 'chin', 5: 'leg l', 6: 'leg r', 7: 'nasal', 8: 'abdo', 9: 'thor'}
+    for i in range(3):
+        for j in range(3):
+            specshow(
+                data[3 * i + j + 1],
+                sr=fs,
+                hop_length=step_size,
+                win_length=window_length,
+                n_fft=nfft,
+                y_axis=display_type if j == 0 else None,
+                x_axis="time" if i == 2 else None,
+                ax=ax[i,j],
+                fmin=fmin,
+                fmax=fmax,
+                cmap='magma'
+            )
+            # Build a rectangle in axes coords
+            left, width = .25, .5
+            bottom, height = .25, .5
+            right = left + width
+            top = bottom + height
+            p = plt.Rectangle((left, bottom), width, height, fill=False)
+            p.set_transform(ax[i, j].transAxes)
+            p.set_clip_on(False)
+            ax[i, j].add_patch(p)
+            ax[i, j].text(0.95, top, itn[3 * i + j + 1],
+                    horizontalalignment='right',
+                    verticalalignment='bottom',
+                    transform=ax[i, j].transAxes,
+                    color='w',
+                    size=24)
 
-    specshow(
-        data,
-        sr=fs,
-        hop_length=step_size,
-        win_length=window_length,
-        n_fft=nfft,
-        y_axis=display_type,
-        x_axis="time",
-        ax=ax,
-        fmin=fmin,
-        fmax=fmax,cmap='magma'
-    )
+    plt.savefig('D:/10channel/3x3_spect.png', dpi=200)
 
     return fig, ax
