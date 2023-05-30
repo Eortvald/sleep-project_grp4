@@ -52,9 +52,9 @@ def event_dist():
         durs = (events[:, 1] - events[:, 0]) * 600
         for event_label in np.unique(events[:, -1]):
             event_durs[event_label].append(list(durs[events[:, -1] == event_label]))
-        break
+            break
     with open("/scratch/s194277/event_durs.json", "w") as f:
         print('saving')
-        json.dump(event_durs, f)
+        json.dump(str(event_durs), f)
 
 event_dist()
