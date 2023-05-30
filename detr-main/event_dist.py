@@ -53,7 +53,7 @@ def event_dist():
         for event_label in np.unique(events[:, -1]):
             event_durs[event_label].append(list(durs[events[:, -1] == event_label]))
 
-    with open("/scratch/s194277/event_count.json", "w+") as f:
+    with open("/scratch/s194277/event_durs.json", "w") as f:
         print('saving')
         json.dump(event_durs, f)
 
