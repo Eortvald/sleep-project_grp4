@@ -174,7 +174,7 @@ def main(args):
         data_dir=data_dir,
         batch_size=args.batch_size,
         n_eval=200 if data_dir == "/scratch/aneol/detr-mros/" else 2,
-        n_test=2500 if data_dir == "/scratch/aneol/detr-mros/" else 0,
+        n_test=2400 if data_dir == "/scratch/aneol/detr-mros/" else 0,
         num_workers=0,
         seed=1338,
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
