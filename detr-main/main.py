@@ -113,9 +113,16 @@ def get_args_parser():
 
 
 def main(args):
-    import pathlib
-    temp = pathlib.PosixPath
-    pathlib.PosixPath = pathlib.WindowsPath
+    # data_dir = "D:/10channel"
+    # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
+    # data_dir="/scratch/s194277/mros/h5"
+    data_dir = "/scratch/aneol/detr-mros/"
+    # data_dir = "/scratch/s194277/mros/h5"
+    # data_dir = "/scratch/aneol/detr-mros/"
+    if data_dir =="D:/10channel":
+        import pathlib
+        temp = pathlib.PosixPath
+        pathlib.PosixPath = pathlib.WindowsPath
 
     utils.init_distributed_mode(args)
     print("git:\n  {}\n".format(utils.get_sha()))
@@ -159,12 +166,6 @@ def main(args):
     #dataset_train = build_dataset(image_set='train', args=args)
     #dataset_val = build_dataset(image_set='val', args=args)
 
-    # data_dir = "D:/10channel"
-    # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
-    # data_dir="/scratch/s194277/mros/h5"
-    data_dir="/scratch/aneol/detr-mros/"
-    #data_dir = "/scratch/s194277/mros/h5"
-    #data_dir = "/scratch/aneol/detr-mros/"
 
     params = dict(
         data_dir=data_dir,
