@@ -58,29 +58,22 @@ class BackboneBase(nn.Module):
 
     def __init__(self, backbone: nn.Module, train_backbone: bool, num_channels: int, return_interm_layers: bool):
         super().__init__()
-        for name, parameter in backbone.named_parameters():
-            if not train_backbone or 'layer2' not in name and 'layer3' not in name and 'layer4' not in name:
-                parameter.requires_grad_(False)
-        if return_interm_layers:
-            return_layers = {"layer1": "0", "layer2": "1", "layer3": "2", "layer4": "3"}
-        else:
-            return_layers = {'layer4': "0"}
 
-        self.convint2 = torch.nn.Conv2d(10, 5, kernel_size=(3, 3))
-        self.convint = torch.nn.Conv2d(5, 3, kernel_size=(3, 3))
-        #self.convint3 = torch.nn.Conv2d(5, 3, kernel_size=(10,10))
-        self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
-        self.num_channels = num_channels
+        '''Commented out for custom backbone'''
+        # for name, parameter in backbone.named_parameters():
+        #     if not train_backbone or 'layer2' not in name and 'layer3' not in name and 'layer4' not in name:
+        #         parameter.requires_grad_(False)
+        # if return_interm_layers:
+        #     return_layers = {"layer1": "0", "layer2": "1", "layer3": "2", "layer4": "3"}
+        # else:
+        #     return_layers = {'layer4': "0"}
+
+        # self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
+        # self.num_channels = num_channels
 
     def forward(self, tensor_list: NestedTensor):
 
-        #CONV TO GO FROM 10 CHANNGELS TO 3 CHANNELS
-        #d3tens = self.convint2(tensor_list.tensors)
-        #d3tens = self.convint(d3tens)
-
-        d3tens = self.convint3(tensor_list.tensors)
-        xs = self.body(d3tens)
-
+        #xs = self.body(tensor_list.tensors)
 
         out: Dict[str, NestedTensor] = {}
         for name, x in xs.items():
@@ -97,11 +90,91 @@ class Backbone(BackboneBase):
                  train_backbone: bool,
                  return_interm_layers: bool,
                  dilation: bool):
-        backbone = getattr(torchvision.models, name)(
-            replace_stride_with_dilation=[False, False, dilation],
-            pretrained=is_main_process(), norm_layer=FrozenBatchNorm2d)
-        num_channels = 512 if name in ('resnet18', 'resnet34') else 2048
-        super().__init__(backbone, train_backbone, num_channels, return_interm_layers)
+
+        ''' Commented out for custom backbone '''
+
+        # backbone = getattr(torchvision.models, name)(
+        #     replace_stride_with_dilation=[False, False, dilation],
+        #     pretrained=is_main_process(), norm_layer=FrozenBatchNorm2d)
+        # num_channels = 512 if name in ('resnet18', 'resnet34') else 2048
+        # super().__init__(backbone, train_backbone, num_channels, return_interm_layers)
+
+        num_channels = 2048
+        super().__init__(self, train_backbone, num_channels, return_interm_layers = False)
+
+class Custom_Backbone(nn.Module):
+    ''' OUR OWN CUSTOM BACKBONE'''
+    def __init__(self, name:str, train_backbone: bool, return_interm_layers: bool, dilation: bool):
+        
+
+        super(Custom_Backbone, self).__init__()
+
+        # Number of data points per channel = 128 * 600
+        C = 10
+
+        self.conv_mix = nn.Conv2d(1, C, kernel_size = (C,1))
+        self.relu = nn.ReLU()
+        self.max_pool = nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2))
+
+        self.conv_layer1 = nn.Conv2d(1, 8, kernel_size=(1,6), stride=(1,2), padding=(0,2))
+        self.batch_norm1 = nn.BatchNorm2d(8)
+
+        self.conv_layer2 = nn.Conv2d(8, 16, kernel_size=(1,6), stride=(1,2), padding=(0,2))
+        self.batch_norm2 = nn.BatchNorm2d(16)
+
+        self.conv_layer3 = nn.Conv2d(16, 32, kernel_size=(1,6), stride=(1,2), padding=(0,2))
+        self.batch_norm3 = nn.BatchNorm2d(32)
+
+        self.conv_layer4 = nn.Conv2d(32, 64, kernel_size=(1,6), stride=(1,2), padding=(0,2))
+        self.batch_norm4 = nn.BatchNorm2d(64)
+
+        self.conv_layer5 = nn.Conv2d(64, 128, kernel_size=(1,6), stride=(1,2), padding=(0,2))
+        self.batch_norm5 = nn.BatchNorm2d(128)
+        self.num_channels = 128
+        BackboneBase(self, train_backbone, self.num_channels, return_interm_layers)
+
+
+    def forward(self, tensor_list: NestedTensor):
+
+        out = self.conv_mix(tensor_list.tensors)
+        out = torch.transpose(out, 1, 2)
+        out = self.relu(out)
+
+        out = self.conv_layer1(out)
+        out = self.batch_norm1(out)
+        out = self.max_pool(out)
+        out = self.relu(out)
+
+        out = self.conv_layer2(out)
+        out = self.batch_norm2(out)
+        out = self.max_pool(out)
+        out = self.relu(out)
+
+        out = self.conv_layer3(out)
+        out = self.batch_norm3(out)
+        out = self.max_pool(out)
+        out = self.relu(out)
+
+        out = self.conv_layer4(out)
+        out = self.batch_norm4(out)
+        out = self.max_pool(out)
+        out = self.relu(out)
+
+        out = self.conv_layer5(out)
+        out = self.batch_norm5(out)
+        out = self.max_pool(out)
+        out = self.relu(out)
+
+        xs = {'0': out}
+
+        out: Dict[str, NestedTensor] = {}
+        for name, x in xs.items():
+            m = tensor_list.mask
+            assert m is not None
+            mask = F.interpolate(m[None].float(), size=x.shape[-2:]).to(torch.bool)[0]
+            out[name] = NestedTensor(x, mask)
+
+        return out
 
 
 class Joiner(nn.Sequential):
@@ -124,7 +197,10 @@ def build_backbone(args):
     position_embedding = build_position_encoding(args)
     train_backbone = args.lr_backbone > 0
     return_interm_layers = args.masks
-    backbone = Backbone(args.backbone, train_backbone, return_interm_layers, args.dilation)
+
+    '''Use own backbone'''
+    backbone = Custom_Backbone(args.backbone, train_backbone, return_interm_layers, args.dilation)
+    #backbone = Backbone(args.backbone, train_backbone, return_interm_layers, args.dilation)
     model = Joiner(backbone, position_embedding)
     model.num_channels = backbone.num_channels
     return model

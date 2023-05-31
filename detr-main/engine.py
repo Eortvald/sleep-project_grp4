@@ -12,8 +12,8 @@ import torch
 import matplotlib.pyplot as plt
 import util.misc as utils
 
-#from datasets.coco_eval import CocoEvaluator
-#from datasets.panoptic_eval import PanopticEvaluator
+from datasets.coco_eval import CocoEvaluator
+from datasets.panoptic_eval import PanopticEvaluator
 
 
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
@@ -100,11 +100,12 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
 
     coco_evaluator = None
 
-    '''
+
     iou_types = tuple(k for k in ('segm', 'bbox') if k in postprocessors.keys())
     coco_evaluator = CocoEvaluator(base_ds, iou_types)
     coco_evaluator.coco_eval[iou_types[0]].params.iouThrs = [0, 0.1, 0.5, 0.75]
-    if 'panoptic' in postprocessors.keys():
+
+    '''if 'panoptic' in postprocessors.keys():
         panoptic_evaluator = PanopticEvaluator(
             data_loader.dataset.ann_file,
             data_loader.dataset.ann_folder,
@@ -123,7 +124,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
             hs = torch.ones(cxs.size(dim=0))
             boxes = torch.column_stack((cxs, cys, ws, hs))
             labels = target[:, 2].long()
-            dict_t = {'boxes': boxes, 'labels': labels}
+            dict_t = {'boxes': boxes, 'labels': labels, 'orig_size': torch.tensor([10, 76800]), 'image_id': torch.tensor(0)}
             targets_new.append(dict_t)
         samples = samples[:, None, :, :]
         samples = samples.to(device)
@@ -143,18 +144,19 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                              **loss_dict_reduced_unscaled)
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
 
-        '''
+
         orig_target_sizes = torch.stack([t["orig_size"] for t in targets], dim=0)
         results = postprocessors['bbox'](outputs, orig_target_sizes)
-        
-        if 'segm' in postprocessors.keys():
+
+        '''if 'segm' in postprocessors.keys():
             target_sizes = torch.stack([t["size"] for t in targets], dim=0)
             results = postprocessors['segm'](results, outputs, orig_target_sizes, target_sizes)
+            
         res = {target['image_id'].item(): output for target, output in zip(targets, results)}
-    
         if coco_evaluator is not None:
-            coco_evaluator.update(res)
+            coco_evaluator.update(res)'''
 
+        '''
         if panoptic_evaluator is not None:
             res_pano = postprocessors["panoptic"](outputs, target_sizes, orig_target_sizes)
             for i, target in enumerate(targets):
@@ -164,6 +166,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                 res_pano[i]["file_name"] = file_name
 
             panoptic_evaluator.update(res_pano)
+    
     '''
 
     # gather the stats from all processes
@@ -173,25 +176,31 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
     '''
     if coco_evaluator is not None:
         coco_evaluator.synchronize_between_processes()
+
+    
     if panoptic_evaluator is not None:
         panoptic_evaluator.synchronize_between_processes()
+    '''
 
     # accumulate predictions from all images
     if coco_evaluator is not None:
         coco_evaluator.accumulate()
         coco_evaluator.summarize()
+    '''
     panoptic_res = None
     if panoptic_evaluator is not None:
         panoptic_res = panoptic_evaluator.summarize()
-'''
+    '''
 
     stats = {k: meter.global_avg for k, meter in metric_logger.meters.items()}
 
-    '''if coco_evaluator is not None:
+
+    if coco_evaluator is not None:
         if 'bbox' in postprocessors.keys():
-            stats['coco_eval_bbox'] = coco_evaluator.coco_eval['bbox'].stats.tolist()
+            stats['coco_eval_bbox'] = coco_evaluator.coco_eval['bbox'].stats #.tolist()
         if 'segm' in postprocessors.keys():
             stats['coco_eval_masks'] = coco_evaluator.coco_eval['segm'].stats.tolist()
+    '''
     if panoptic_res is not None:
         stats['PQ_all'] = panoptic_res["All"]
         stats['PQ_th'] = panoptic_res["Things"]

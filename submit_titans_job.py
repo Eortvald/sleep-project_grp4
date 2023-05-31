@@ -6,11 +6,11 @@ JOBS = [
     {
         "jobname": "event_dist",
         "partition": "titans",
-        "reservation": "comp-gpu07",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
+        "reservation": "comp-gpu10",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
-        "ncpus": 20,  # Number of CPU cores
+        "ncpus": 30,  # Number of CPU cores
         "gpus": 0,  # Number of GPUs
-        "memory": "128G",  # This is total RAM, change this accordingly to use
+        "memory": "220G",  # This is total RAM, change this accordingly to use
         "command": "python detr-main/event_dist.py",
         "log_path": "/scratch/s194277/"  # Usually this is your scratch space
 

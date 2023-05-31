@@ -11,10 +11,10 @@ import wandb
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, DistributedSampler
-
+from eval_scores import eval_score
 #import datasets
 import util.misc as utils
-#from datasets import build_dataset, get_coco_api_from_dataset
+from datasets import build_dataset, get_coco_api_from_dataset
 from engine import evaluate, train_one_epoch
 from models import build_model
 import os
@@ -29,7 +29,7 @@ def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
     parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--lr_backbone', default=1e-4, type=float)
-    parser.add_argument('--batch_size', default=6, type=int)
+    parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
     parser.add_argument('--epochs', default=300, type=int)
     parser.add_argument('--lr_drop', default=100, type=int)
@@ -60,7 +60,7 @@ def get_args_parser():
                         help="Dropout applied in the transformer")
     parser.add_argument('--nheads', default=8, type=int,
                         help="Number of attention heads inside the transformer's attentions")
-    parser.add_argument('--num_queries', default=25, type=int,
+    parser.add_argument('--num_queries', default=100, type=int,
                         help="Number of query slots")
     parser.add_argument('--pre_norm', action='store_true')
 
@@ -100,7 +100,7 @@ def get_args_parser():
     parser.add_argument('--resume', default='', help='resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
-    parser.add_argument('--eval', action='store_true')
+    parser.add_argument('--eval', default='True', action='store_true')
     parser.add_argument('--num_workers', default=0, type=int)
 
     # distributed training parameters
@@ -155,7 +155,7 @@ def main(args):
     #dataset_train = build_dataset(image_set='train', args=args)
     #dataset_val = build_dataset(image_set='val', args=args)
 
-    #data_dir = "D:/10channel"
+    # data_dir = "D:/10channel"
     # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
     # data_dir="/scratch/s194277/mros/h5"
     data_dir="/scratch/aneol/detr-mros/"
@@ -165,8 +165,8 @@ def main(args):
     params = dict(
         data_dir=data_dir,
         batch_size=args.batch_size,
-        n_eval=200 if data_dir == "/scratch/aneol/detr-mros/" else 1,
-        n_test=0 if data_dir == "/scratch/aneol/detr-mros/" else 1,
+        n_eval=200 if data_dir == "/scratch/aneol/detr-mros/" else 2,
+        n_test=0 if data_dir == "/scratch/aneol/detr-mros/" else 0,
         num_workers=0,
         seed=1338,
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
@@ -184,7 +184,7 @@ def main(args):
         transform=None,
         scaling="robust",
     )
-    wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
+    '''wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
     wandb.init(
         # set the wandb project where this run will be logged
         project='Low-complex',
@@ -198,13 +198,13 @@ def main(args):
             "epochs": args.epochs,
             "batch_size": args.batch_size
         }
-    )
+    )'''
 
     dm = SleepEventDataModule(**params)
     dm.setup('fit')
     dataset_train = dm.train
     dataset_val = dm.eval
-    base_ds = None
+    base_ds = get_coco_api_from_dataset(dm.eval)
 
 
     if args.distributed:
@@ -252,12 +252,16 @@ def main(args):
             lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
             args.start_epoch = checkpoint['epoch'] + 1
 
-    #if args.eval:
-        #test_stats, coco_evaluator = evaluate(model, criterion, postprocessors,
-        #                                     data_loader_val, base_ds, device, args.output_dir)
-        #if args.output_dir:
-        #    utils.save_on_master(coco_evaluator.coco_eval["bbox"].eval, output_dir / "eval.pth")
-        #return
+    if args.eval:
+        test_stats = eval_score(model, criterion, postprocessors,
+                                              data_loader_val, base_ds, device, args.output_dir, args)
+
+        '''test_stats, coco_evaluator = evaluate(model, criterion, postprocessors,
+                                             data_loader_val, base_ds, device, args.output_dir)
+        if args.output_dir:
+            utils.save_on_master(coco_evaluator.coco_eval["bbox"].eval, output_dir / "eval.pth")'''
+
+        return
 
     print(args.distributed)
     print("Start training")
@@ -287,7 +291,7 @@ def main(args):
         test_stats, coco_evaluator = evaluate(
             model, criterion, postprocessors, data_loader_val, base_ds, device, args.output_dir
         )
-        wandb.log({
+        '''wandb.log({
             "train_loss": train_stats['loss'],
             "train_class_error": train_stats['class_error'],
             "train_loss_bbox": train_stats['loss_bbox'],
@@ -296,7 +300,7 @@ def main(args):
             "test_class_error": test_stats['class_error'],
             "test_loss_bbox": test_stats['loss_bbox'],
             "test_loss_giou": test_stats['loss_giou']
-        })
+        })'''
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                      **{f'test_{k}': v for k, v in test_stats.items()},
