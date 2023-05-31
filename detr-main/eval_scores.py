@@ -53,9 +53,11 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
         out_idx = indices[0][0]
         t_idx = indices[0][1]
 
+        out_prob = outputs["pred_logits"].flatten(0, 1).argmax(-1)
+
         for i in range(len(giou)):
             label = targets[0]['labels'][t_idx[i]]
-            pred_label = outputs['pred_logits'].argmax(-1)[0][out_idx[i]]
+            pred_label = out_prob[out_idx[i]]
             if pred_label > 3:
                 pred_label = 3
             if giou[i] >= 0.3:
