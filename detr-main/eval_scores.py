@@ -44,15 +44,17 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
         src_boxes = outputs['pred_boxes'][idx]
         target_boxes = torch.cat([t['boxes'][i] for t, (_, i) in zip(targets, indices)], dim=0)
 
-        giou = torch.diag(box_ops.generalized_box_iou(
+        giou = box_ops.generalized_box_iou(
             box_ops.box_cxcywh_to_xyxy(src_boxes),
-            box_ops.box_cxcywh_to_xyxy(target_boxes)))
+            box_ops.box_cxcywh_to_xyxy(target_boxes))
+
 
         out_idx = indices[0][0]
         t_idx = indices[0][1]
 
         for i in range(len(giou)):
             if giou[i] >= 0.3:
+                print("success", giou[i])
                 label = targets[0]['labels'][t_idx[i]]
                 pred_label = outputs['pred_logits'].argmax(-1)[0][out_idx[i]]
                 conf_ma[pred_label, label] += 1
