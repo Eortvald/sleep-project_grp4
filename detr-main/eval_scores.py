@@ -20,8 +20,8 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
     model.eval()
     criterion.eval()
 
-    ma_conf_noiou = np.zeros((4,3))
-    conf_ma = np.zeros((4,3))
+    ma_conf_noiou = np.zeros((4,4))
+    conf_ma = np.zeros((4,4))
 
     for s_idx, (samples, targets, records, *_) in enumerate(tqdm(data_loader)):
         if s_idx % 500 == 0:
@@ -77,6 +77,15 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
         query_idx = indices[0][0]
         tgt_idx = indices[0][1]
 
+        m = np.ones(100)
+        m[query_idx] = 0
+
+        for c in out_prob[out_prob[m, :].argmax(-1) < 3].argmax(-1):
+            if c > 3:
+                c = 3
+            conf_ma[c, 3] += 1
+            ma_conf_noiou[c, 3] += 1
+
         giou = -cost_giou[query_idx, tgt_idx]
         labels = tgt_ids[tgt_idx]
         pred_labels = out_prob.argmax(-1)[query_idx]
@@ -90,11 +99,9 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
                 conf_ma[pl, l] += 1
             ma_conf_noiou[pl, l] += 1
 
-
-
     if data_dir =="D:/10channel":
-        np.save('D:/predictions/' + args.backbone + 'n.npy', ma_conf_noiou)
-        np.save('D:/predictions/' + args.backbone + 'i.npy', conf_ma)
+        np.save('D:/predictions/' + args.backbone + '_n.npy', ma_conf_noiou)
+        np.save('D:/predictions/' + args.backbone + '_i.npy', conf_ma)
     else:
         np.save('/scratch/s203877/' + args.backbone + 'n.npy', ma_conf_noiou)
         np.save('/scratch/s203877/' + args.backbone + 'i.npy', conf_ma)

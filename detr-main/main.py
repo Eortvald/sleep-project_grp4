@@ -99,7 +99,7 @@ def get_args_parser():
     parser.add_argument('--seed', default=42, type=int)
     parser.add_argument('--resume', default='/scratch/s203877/checkpoint/5233/checkpoint0149.pth', help='resume from checkpoint')
     #parser.add_argument('--resume', default='D:/checkpoints/low_complex/checkpoint0099.pth',
-    #                    help='resume from checkpoint')
+                        help='resume from checkpoint')
 
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
@@ -116,7 +116,7 @@ def get_args_parser():
 
 
 def main(args):
-    #data_dir = "D:/10channel"
+    # data_dir = "D:/10channel"
     # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
     # data_dir="/scratch/s194277/mros/h5"
     data_dir = "/scratch/aneol/detr-mros/"
@@ -174,7 +174,7 @@ def main(args):
         data_dir=data_dir,
         batch_size=args.batch_size,
         n_eval=200 if data_dir == "/scratch/aneol/detr-mros/" else 2,
-        n_test=2400 if data_dir == "/scratch/aneol/detr-mros/" else 0,
+        n_test=2600 if data_dir == "/scratch/aneol/detr-mros/" else 0,
         num_workers=0,
         seed=1338,
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
