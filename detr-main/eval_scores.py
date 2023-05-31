@@ -24,6 +24,8 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
     conf_ma = np.zeros((4,3))
 
     for s_idx, (samples, targets, records, *_) in enumerate(tqdm(data_loader)):
+        if s_idx % 500 == 0:
+            print(s_idx, 'samples processed')
         targets_new = []
         # NEW TARGET IS LIST(DICTIONARY(TENSOR)))
         for i, target in enumerate(targets):
