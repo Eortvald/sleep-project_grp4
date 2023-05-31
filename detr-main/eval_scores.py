@@ -52,7 +52,7 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
         t_idx = indices[0][1]
 
         for i in range(len(giou)):
-            if giou[i] >= 0.0:
+            if giou[i] >= 0.3:
                 label = targets[0]['labels'][t_idx[i]]
                 pred_label = outputs['pred_logits'].argmax(-1)[0][out_idx[i]]
                 conf_ma[pred_label, label] += 1
