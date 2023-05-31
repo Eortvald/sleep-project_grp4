@@ -16,6 +16,7 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
     model.eval()
     criterion.eval()
 
+    ma_conf_noiou = np.zeros((3,3))
     conf_ma = np.zeros((3,3))
 
     for s_idx, (samples, targets, records, *_) in enumerate(tqdm(data_loader)):
@@ -44,21 +45,22 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
         src_boxes = outputs['pred_boxes'][idx]
         target_boxes = torch.cat([t['boxes'][i] for t, (_, i) in zip(targets, indices)], dim=0)
 
-        giou = box_ops.generalized_box_iou(
+        giou = torch.diag(box_ops.generalized_box_iou(
             box_ops.box_cxcywh_to_xyxy(src_boxes),
-            box_ops.box_cxcywh_to_xyxy(target_boxes))
-
+            box_ops.box_cxcywh_to_xyxy(target_boxes)))
 
         out_idx = indices[0][0]
         t_idx = indices[0][1]
 
         for i in range(len(giou)):
+            label = targets[0]['labels'][t_idx[i]]
+            pred_label = outputs['pred_logits'].argmax(-1)[0][out_idx[i]]
             if giou[i] >= 0.3:
                 print("success", giou[i])
-                label = targets[0]['labels'][t_idx[i]]
-                pred_label = outputs['pred_logits'].argmax(-1)[0][out_idx[i]]
                 conf_ma[pred_label, label] += 1
+            ma_conf_noiou[pred_label, label] += 1
 
+    np.save('/scratch/s203877/' + args.backbone + '_conf_noiou.npy', ma_conf_noiou)
     np.save('/scratch/s203877/' + args.backbone + '_conf_matrix.npy', conf_ma)
 
     return 'fuck off'
