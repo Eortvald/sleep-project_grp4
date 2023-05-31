@@ -57,6 +57,6 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
                 pred_label = outputs['pred_logits'].argmax(-1)[0][out_idx[i]]
                 conf_ma[pred_label, label] += 1
 
-    np.save('/scratch/s194277/' + args.backbone + '_conf_matrix.npy', conf_ma)
+    np.save('/scratch/s203877/' + args.backbone + '_conf_matrix.npy', conf_ma)
 
     return 'fuck off'

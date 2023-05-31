@@ -9,8 +9,8 @@ import sys
 
 from pathlib import Path
 
-#sys.path.append('/home/s203877/bachelor/low-complex/sleep-project_grp4/detr-main')
-sys.path.append('/home/s194277/sleep/sleep-project_grp4/detr-main')
+sys.path.append('/home/s203877/bachelor/low-complex/sleep-project_grp4/detr-main')
+#sys.path.append('/home/s194277/sleep/sleep-project_grp4/detr-main')
 import main as detection
 import submitit
 
@@ -33,8 +33,8 @@ def get_shared_folder() -> Path:
     #     p = Path(f"/checkpoint/{user}/experiments")
     #     p.mkdir(exist_ok=True)
     #     return p
-    #p = Path(f"/scratch/s203877/checkpoint")
-    p = Path(f"/scratch/s194277/checkpoint")
+    p = Path(f"/scratch/s203877/checkpoint")
+    #p = Path(f"/scratch/s194277/checkpoint")
     p.mkdir(exist_ok=True)
     return p
     raise RuntimeError("No shared folder available")
@@ -54,8 +54,8 @@ class Trainer(object):
         self.args = args
 
     def __call__(self):
-        #sys.path.append('/home/s203877/bachelor/low-complex/sleep-project_grp4/detr-main')
-        sys.path.append('/home/s194277/sleep/sleep-project_grp4/detr-main')
+        sys.path.append('/home/s203877/bachelor/low-complex/sleep-project_grp4/detr-main')
+        #sys.path.append('/home/s194277/sleep/sleep-project_grp4/detr-main')
         import main as detection
 
         self._setup_gpu_args()
