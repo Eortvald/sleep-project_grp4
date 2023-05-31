@@ -16,8 +16,8 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
     model.eval()
     criterion.eval()
 
-    ma_conf_noiou = np.zeros((3,3))
-    conf_ma = np.zeros((3,3))
+    ma_conf_noiou = np.zeros((4,3))
+    conf_ma = np.zeros((4,3))
 
     for s_idx, (samples, targets, records, *_) in enumerate(tqdm(data_loader)):
         targets_new = []
@@ -37,6 +37,7 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
         outputs = model(samples)
+
         matcher = build_matcher(args)
         indices = matcher(outputs, targets)
         batch_idx = torch.cat([torch.full_like(src, i) for i, (src, _) in enumerate(indices)])
@@ -55,12 +56,15 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
         for i in range(len(giou)):
             label = targets[0]['labels'][t_idx[i]]
             pred_label = outputs['pred_logits'].argmax(-1)[0][out_idx[i]]
+            if pred_label > 3:
+                pred_label = 3
             if giou[i] >= 0.3:
-                print("success", giou[i])
                 conf_ma[pred_label, label] += 1
             ma_conf_noiou[pred_label, label] += 1
 
-    np.save('/scratch/s203877/' + args.backbone + '_conf_noiou.npy', ma_conf_noiou)
-    np.save('/scratch/s203877/' + args.backbone + '_conf_matrix.npy', conf_ma)
+    #np.save('/scratch/s203877/' + args.backbone + '_conf_noiou.npy', ma_conf_noiou)
+    #np.save('/scratch/s203877/' + args.backbone + '_conf_matrix.npy', conf_ma)
+    np.save('D:/predictions/' + args.backbone + '_conf_noiou.npy', ma_conf_noiou)
+    np.save('D:/predictions/' + args.backbone + '_conf_matrix.npy', conf_ma)
 
     return 'fuck off'

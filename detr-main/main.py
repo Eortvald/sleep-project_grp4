@@ -113,6 +113,10 @@ def get_args_parser():
 
 
 def main(args):
+    import pathlib
+    temp = pathlib.PosixPath
+    pathlib.PosixPath = pathlib.WindowsPath
+
     utils.init_distributed_mode(args)
     print("git:\n  {}\n".format(utils.get_sha()))
 
@@ -166,7 +170,7 @@ def main(args):
         data_dir=data_dir,
         batch_size=args.batch_size,
         n_eval=200 if data_dir == "/scratch/aneol/detr-mros/" else 2,
-        n_test=0 if data_dir == "/scratch/aneol/detr-mros/" else 0,
+        n_test=2500 if data_dir == "/scratch/aneol/detr-mros/" else 0,
         num_workers=0,
         seed=1338,
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
@@ -204,8 +208,7 @@ def main(args):
     dm.setup('fit')
     dataset_train = dm.train
     dataset_val = dm.eval
-    base_ds = get_coco_api_from_dataset(dm.eval)
-
+    base_ds = None
 
     if args.distributed:
         sampler_train = DistributedSampler(dataset_train)
@@ -254,7 +257,7 @@ def main(args):
 
     if args.eval:
         test_stats = eval_score(model, criterion, postprocessors,
-                                              data_loader_val, base_ds, device, args.output_dir, args)
+                                              data_loader_train, base_ds, device, args.output_dir, args)
 
         '''test_stats, coco_evaluator = evaluate(model, criterion, postprocessors,
                                              data_loader_val, base_ds, device, args.output_dir)
