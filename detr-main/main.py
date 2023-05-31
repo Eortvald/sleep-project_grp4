@@ -98,6 +98,9 @@ def get_args_parser():
                         help='device to use for training / testing')
     parser.add_argument('--seed', default=42, type=int)
     parser.add_argument('--resume', default='/scratch/s203877/checkpoint/5233/checkpoint0149.pth', help='resume from checkpoint')
+    #parser.add_argument('--resume', default='D:/checkpoints/low_complex/checkpoint0099.pth',
+    #                    help='resume from checkpoint')
+
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
     parser.add_argument('--eval', default='True', action='store_true')
@@ -113,7 +116,7 @@ def get_args_parser():
 
 
 def main(args):
-    # data_dir = "D:/10channel"
+    #data_dir = "D:/10channel"
     # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
     # data_dir="/scratch/s194277/mros/h5"
     data_dir = "/scratch/aneol/detr-mros/"
