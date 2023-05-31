@@ -12,7 +12,7 @@ from models.matcher import build_matcher
 from tqdm import tqdm
 
 @torch.no_grad()
-def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, output_dir, args):
+def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, output_dir, args, data_dir):
     model.eval()
     criterion.eval()
 
@@ -62,9 +62,13 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
                 conf_ma[pred_label, label] += 1
             ma_conf_noiou[pred_label, label] += 1
 
-    #np.save('/scratch/s203877/' + args.backbone + '_conf_noiou.npy', ma_conf_noiou)
-    #np.save('/scratch/s203877/' + args.backbone + '_conf_matrix.npy', conf_ma)
-    np.save('D:/predictions/' + args.backbone + '_conf_noiou.npy', ma_conf_noiou)
-    np.save('D:/predictions/' + args.backbone + '_conf_matrix.npy', conf_ma)
+
+
+    if data_dir =="D:/10channel":
+        np.save('D:/predictions/' + args.backbone + '_conf_noiou.npy', ma_conf_noiou)
+        np.save('D:/predictions/' + args.backbone + '_conf_matrix.npy', conf_ma)
+    else:
+        np.save('/scratch/s203877/' + args.backbone + '_conf_noiou.npy', ma_conf_noiou)
+        np.save('/scratch/s203877/' + args.backbone + '_conf_matrix.npy', conf_ma)
 
     return 'fuck off'
