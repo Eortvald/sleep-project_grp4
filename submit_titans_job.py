@@ -9,7 +9,7 @@ JOBS = [
         "reservation": "comp-gpu10",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
         "ncpus": 30,  # Number of CPU cores
-        "gpus": 0,  # Number of GPUs
+        "gpus": 1,  # Number of GPUs
         "memory": "220G",  # This is total RAM, change this accordingly to use
         "command": "python detr-main/main.py",
         "log_path": "/scratch/s194277/"  # Usually this is your scratch space
