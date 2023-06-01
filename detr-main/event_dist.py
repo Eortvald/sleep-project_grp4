@@ -49,11 +49,12 @@ def event_dist():
     event_durs = {0: [], 1: [], 2: []}
     # print(train_ds[0]['signal'].shape)
     for idx, batch in enumerate(train_ds):
+        if idx % 500 == 0:
+            print(idx)
         events = batch['events']
         durs = (events[:, 1] - events[:, 0])
         for event_label in np.unique(events[:, -1]):
             event_durs[event_label].append(np.mean(durs[events[:, -1] == event_label]))
-        print(event_durs)
     with open("/scratch/s194277/event_durs.json", "w") as f:
         print('saving')
         json.dump(str(event_durs), f)
