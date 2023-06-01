@@ -10,7 +10,7 @@ import matplotlib.patches as patches
 def legend_without_duplicate_labels(ax):
     handles, labels = ax.get_legend_handles_labels()
     unique = [(h, l) for i, (h, l) in enumerate(zip(handles, labels)) if l not in labels[:i]]
-    ax.legend(*zip(*unique), loc='upper right')
+    ax.legend(*zip(*unique), loc='upper center')
 
 def plot_data(
     data: np.ndarray,
@@ -23,7 +23,7 @@ def plot_data(
 
     # Get current axes or create new
     if ax is None:
-        fig, ax = plt.subplots(figsize=(25, 4))
+        fig, ax = plt.subplots(figsize=(25, 16))
         ax.set_xlabel("Time (s)")
     else:
         fig = ax.get_figure()
@@ -35,6 +35,7 @@ def plot_data(
             labelbottom=False,
         )  # labels along the bottom edge are off
 
+    data = data[:, 0:25600]
     C, T = data.shape
     time_vector = np.arange(T) / fs
 
@@ -54,7 +55,7 @@ def plot_data(
         class_events = events[events[:, -1] == event_label, :-1] * T / fs
         for evt_start, evt_stop in class_events:
             label = np.unique(event_label_dict[event_label])
-            ax.axvspan(evt_start, evt_stop, facecolor=color, alpha=0.6 if not color=='yellow' else 0.8, edgecolor=None, label = label)
+            ax.axvspan(evt_start*3, evt_stop*3, facecolor=color, alpha=0.6 if not color=='yellow' else 0.8, edgecolor=None, label = label)
             legend_without_duplicate_labels(ax)
 
     # Calculate the offset between signals
@@ -70,18 +71,19 @@ def plot_data(
         offset[idx + 1] = -2 * (idx + 1)
 
     # Plot signals
-    ax.plot(time_vector, data.T + offset.T, color="gray", linewidth=0.1)
+    ax.plot(time_vector, data.T + offset.T, color="gray", linewidth=1)
 
     # Adjust plot visuals
     ax.set_xlim(time_vector[0], time_vector[-1])
     ax.set_yticks(ticks=offset[:, 0], labels=channel_names)
-    ax.set_title(title)
+    #ax.set_title(title)
 
     font = {'family': 'Times new roman',
             'weight': 'bold',
-            'size': 20}
+            'size': 24}
 
     plt.rc('font', **font)
+    plt.savefig('C:/Users/Nullerh/Downloads/10channel.png', dpi = 250)
     return fig, ax
 
 

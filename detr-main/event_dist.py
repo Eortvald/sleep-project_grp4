@@ -9,6 +9,7 @@ import torch
 import numpy as np
 import ast
 import json
+import math
 
 def event_dist():
     data_dir = "/scratch/aneol/detr-mros/"
@@ -49,9 +50,10 @@ def event_dist():
     # print(train_ds[0]['signal'].shape)
     for idx, batch in enumerate(train_ds):
         events = batch['events']
-        durs = (events[:, 1] - events[:, 0]) * 600
+        durs = (events[:, 1] - events[:, 0])
         for event_label in np.unique(events[:, -1]):
-            event_durs[event_label].append(list(durs[events[:, -1] == event_label]))
+            event_durs[event_label].append(np.mean(durs[events[:, -1] == event_label]))
+        print(event_durs)
     with open("/scratch/s194277/event_durs.json", "w") as f:
         print('saving')
         json.dump(str(event_durs), f)
